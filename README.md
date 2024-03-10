@@ -106,14 +106,9 @@
 ### Example
 
 ```python
-import sqlite3
-
-BD_name = 'database.db'
-
-# Function definitions...
+from DB import *
 
 # Example usage:
-create_database()
 add_user('JohnDoe', 'password123', 'history1', 'history2', 0)
 ```
 
