@@ -1,115 +1,83 @@
-## SQLite Database Management System 
+## README: SQLite Database Manager
 
-### Requirements
+Этот класс Python, `DBManager`, предоставляет функционал для управления базой данных SQLite. Он включает методы для создания таблиц, добавления, удаления, обновления и извлечения данных из базы данных.
 
-- Python 3.x
-- SQLite3
+### Зависимости
+- Библиотека `sqlite3`
 
-### Usage
+### Использование
 
-1. **Database Creation**
-   
-   ```python
-   create_database()
-   ```
+1. **Инициализация**: Создайте экземпляр `DBManager`, указав имя файла базы данных SQLite.
 
-   This function creates a SQLite database file named `database.db` and initializes two tables: `User` and `Chat`.
-
-2. **Adding a User**
-   
-   ```python
-   add_user(username, password, histRest, histAns, isAdmin)
-   ```
-
-   Adds a new user to the `User` table with the specified parameters.
-
-3. **Deleting a User**
-   
-   ```python
-   delete_user(userId)
-   ```
-
-   Deletes a user from the `User` table based on the given user ID.
-
-4. **Getting All Users**
-   
-   ```python
-   get_all_users()
-   ```
-
-   Retrieves all users from the `User` table.
-
-5. **Getting User by ID**
-   
-   ```python
-   get_user_by_id(userId)
-   ```
-
-   Retrieves user information from the `User` table based on the provided user ID.
-
-6. **Updating User Information**
-   
-   ```python
-   update_user_by_id(user_id, newUsername, newPassword, newHistRest, newHistAns, newIsAdmin)
-   ```
-
-   Updates the information of a user in the `User` table with the specified user ID.
-
-7. **Deleting All Users**
-   
-   ```python
-   delete_all_users()
-   ```
-
-   Deletes all users from the `User` table.
-
-8. **Adding a Message**
-   
-   ```python
-   add_message(userID, message)
-   ```
-
-   Adds a message to the `Chat` table associated with the given user ID.
-
-9. **Getting All Messages**
-   
-   ```python
-   get_all_messages()
-   ```
-
-   Retrieves all messages from the `Chat` table.
-
-10. **Deleting All Messages**
-    
     ```python
-    delete_all_messages()
+    db_manager = DBManager('my_database.db')
     ```
 
-    Deletes all messages from the `Chat` table.
+2. **Создание базы данных**: Используйте метод `create_database()` для создания необходимых таблиц в базе данных.
 
-11. **Deleting a Message**
-    
     ```python
-    delete_message(messageID)
+    db_manager.create_database()
     ```
 
-    Deletes a message from the `Chat` table based on the given message ID.
+3. **Добавление пользователя**: Добавьте пользователя в таблицу `User` с помощью метода `add_user()`.
 
-12. **Getting Messages by User ID**
-    
     ```python
-    get_messages_by_user_id(userID)
+    db_manager.add_user('username', 'password', isAdmin)
     ```
 
-    Retrieves all messages associated with the provided user ID from the `Chat` table.
+4. **Удаление пользователя**: Удалите пользователя из таблицы `User` с помощью метода `delete_user()`.
 
-### Example
+    ```python
+    db_manager.delete_user(user_id)
+    ```
 
-```python
-from DB import *
+5. **Обновление пользователя**: Обновите информацию о пользователе в таблице `User` с помощью метода `update_user_by_id()`.
 
-# Example usage:
-add_user('JohnDoe', 'password123', 'history1', 'history2', 0)
-```
+    ```python
+    db_manager.update_user_by_id(user_id, newUsername, newPassword, newIsAdmin)
+    ```
 
-This script provides a flexible interface to interact with the SQLite database, enabling easy management of users and messages.
+6. **Получение пользователей**: Получите информацию о пользователе из таблицы `User` с помощью метода `get_user_by_id()` или `get_all_users()`.
+
+    ```python
+    user_info = db_manager.get_user_by_id(user_id)
+    all_users = db_manager.get_all_users()
+    ```
+
+7. **Добавление сообщения**: Добавьте сообщение в таблицу `Chat` с помощью метода `add_message()`.
+
+    ```python
+    db_manager.add_message(user_id, 'message')
+    ```
+
+8. **Удаление сообщения**: Удалите сообщение из таблицы `Chat` с помощью метода `delete_message()`.
+
+    ```python
+    db_manager.delete_message(message_id)
+    ```
+
+9. **Получение сообщений**: Получите сообщения из таблицы `Chat` с помощью метода `get_all_messages()` или `get_messages_by_user_id()`.
+
+    ```python
+    all_messages = db_manager.get_all_messages()
+    user_messages = db_manager.get_messages_by_user_id(user_id)
+    ```
+
+10. **Обработка ошибок**: Класс включает обработку ошибок для операций с базой данных.
+
+    ```python
+    try:
+        # Операция с базой данных
+    except sqlite3.Error as e:
+        print("Ошибка:", e)
+    ```
+
+### Дополнительные методы
+
+- `delete_all_users()`: Удалить всех пользователей из таблицы `User`.
+- `delete_all_messages()`: Удалить все сообщения из таблицы `Chat`.
+- `get_user_hist(userID)`: Получить историю пользователя из таблицы `History`.
+- `delete_history(histID)`: Удалить историю из таблицы `History`.
+
+### Примечание
+:Убедитесь, что файл базы данных SQLite существует и доступен экземпляру класса. Файл базы данных будет создан, если он не существует, при вызове `create_database()`.
