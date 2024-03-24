@@ -12,6 +12,7 @@ class DBManager:
         c.execute('''CREATE TABLE IF NOT EXISTS User (
                         ID INTEGER PRIMARY KEY,
                         username TEXT,
+                        email TEXT,
                         password TEXT,
                         isAdmin INTEGER
                     )''')
@@ -33,16 +34,21 @@ class DBManager:
                         FOREIGN KEY (userID) REFERENCES User(ID)
                     )''')
 
+        c.execute('''CREATE TABLE IF NOT EXISTS BlackList (
+                        ID INTEGER PRIMARY KEY,
+                        banedEmail TEXT
+                    )''')
+
         conn.commit()
         conn.close()
 
-    def add_user(self, username, password, isAdmin):
+    def add_user(self, username, email, password, isAdmin):
         try:
             conn = sqlite3.connect(self.DB_name)
             c = conn.cursor()
 
-            c.execute('''INSERT INTO User (username, password, isAdmin)
-                         VALUES (?, ?, ?)''', (username, password, isAdmin))
+            c.execute('''INSERT INTO User (username, email, password, isAdmin)
+                         VALUES (?, ?, ?, ?)''', (username, email, password, isAdmin))
 
             conn.commit()
             conn.close()
@@ -91,15 +97,15 @@ class DBManager:
             print("Ошибка при получении пользователей из базы данных:", e)
             return None
 
-    def update_user_by_id(self, user_id, newUsername, newPassword, newIsAdmin):
+    def update_user_by_id(self, user_id, newUsername, newEmail, newPassword, newIsAdmin):
         try:
             conn = sqlite3.connect(self.DB_name)
             c = conn.cursor()
 
             c.execute('''UPDATE User 
-                         SET username = ?, password = ?, isAdmin = ? 
+                         SET username = ?, email = ?, password = ?, isAdmin = ? 
                          WHERE ID = ?''',
-                      (newUsername, newPassword, newIsAdmin, user_id))
+                      (newUsername, newEmail, newPassword, newIsAdmin, user_id))
 
             conn.commit()
             conn.close()
@@ -216,5 +222,64 @@ class DBManager:
         except sqlite3.Error as e:
             print("Ошибка при удалении истории", e)
 
+
+    #  //TO_DO// need to update this method
+    def ban_user(self, userID):
+        try:
+            conn = sqlite3.connect(self.DB_name)
+            c = conn.cursor()
+
+            user = self.get_user_by_id(userID)
+
+            c.execute('''INSERT INTO BlackList (banedEmail)
+                         VALUES (?)''',(user[2],) )
+
+            conn.commit()
+            conn.close()
+            print("Пользователь успешно забанен.")
+        except sqlite3.Error as e:
+            print("Ошибка при бане пользователя:", e)
+
+
+    def get_all_banned_users(self):
+        try:
+            conn = sqlite3.connect(self.DB_name)
+            c = conn.cursor()
+
+            c.execute('''SELECT * FROM BlackList''')
+            banned_users = c.fetchall()
+
+            conn.close()
+            return banned_users
+        except sqlite3.Error as e:
+            print("Ошибка при получении забаненных пользователей:", e)
+            return None
+
+    def get_user_by_email(self, email):
+        try:
+            conn = sqlite3.connect(self.DB_name)
+            c = conn.cursor()
+
+            c.execute('''SELECT * FROM User WHERE email = ?''', (email,))
+            user = c.fetchone()
+
+            conn.close()
+            return user
+        except sqlite3.Error as e:
+            print("Ошибка при получении пользователя по email:", e)
+            return None
+
+    def delete_user_from_blackList(self, userEmail):
+        try:
+            conn = sqlite3.connect(self.DB_name)
+            c = conn.cursor()
+
+            c.execute('''DELETE FROM BlackList WHERE banedEmail = ?''', (userEmail,))
+
+            conn.commit()
+            conn.close()
+            print("Пользователь успешно разбанен.")
+        except sqlite3.Error as e:
+            print("Ошибка при разбане пользователя:", e)
 
 
